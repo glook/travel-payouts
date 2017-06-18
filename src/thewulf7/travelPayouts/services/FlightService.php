@@ -113,6 +113,9 @@ class FlightService extends AbstractService implements iService
         $options['passengers'] = implode(':', $options['passengers']);
         $options['segments']   = implode(':', $options['segments']);
 
+        //Add token at start of array
+        array_unshift($options,$this->getClient()->getToken());
+        
         return md5(implode(':', $options));
 
     }
