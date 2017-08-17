@@ -41,10 +41,10 @@ class Client
         $this->_client = new HttpClient(
             [
                 'base_uri' => self::API_HOST,
-                'headers'  =>
+                'headers' =>
                     [
-                        'Content-Type'    => 'application/json',
-                        'X-Access-Token'  => $this->_token,
+                        'Content-Type' => 'application/json',
+                        'X-Access-Token' => $this->_token,
                         'Accept-Encoding' => 'gzip,deflate,sdch',
                     ],
             ]
@@ -56,22 +56,19 @@ class Client
      * @param array     $options
      * @param string    $type
      * @param bool|true $replaceOptions
+     * @param bool|true $returnJson
      *
      * @return mixed
      */
-    public function execute($url, array $options, $type = 'GET', $replaceOptions = true)
+    public function execute($url, array $options, $type = 'GET', $replaceOptions = true, $returnJson = true)
     {
-        $url    = '/' . $this->getApiVersion() . '/' . $url;
-        $params = [
-            'http_errors' => false,
-        ];
+        $url = '/' . $this->getApiVersion() . '/' . $url;
+        $params = ['http_errors' => false,];
 
-        if ($replaceOptions)
-        {
-            $paramName          = $type === 'GET' ? 'query' : 'body';
+        if ($replaceOptions) {
+            $paramName = $type === 'GET' ? 'query' : 'body';
             $params[$paramName] = $options;
-        } else
-        {
+        } else {
             $params += $options;
         }
 
@@ -79,24 +76,28 @@ class Client
         $res = $this->getClient()->request($type, $url, $params);
 
         $statusCode = $res->getStatusCode();
-        $body       = $res->getBody();
+        $body = $res->getBody();
 
-        if ($statusCode !== 200)
-        {
+        if ($statusCode !== 200) {
             $strBody = json_decode((string)$body, true);
 
             $message = isset($strBody['message']) ? $strBody['message'] : 'unknown';
 
             throw new \RuntimeException("{$statusCode}:{$message}");
         }
-
-        return $this->makeApiResponse($body);
+        if ($returnJson) {
+            return $this->makeApiResponse($body);
+        }else{
+            return (string) $body;
+        }
     }
+
 
     /**
      * @return mixed
      */
-    public function getApiVersion()
+    public
+    function getApiVersion()
     {
         return $this->_apiVersion;
     }
@@ -106,7 +107,8 @@ class Client
      *
      * @return $this
      */
-    public function setApiVersion($apiVersion)
+    public
+    function setApiVersion($apiVersion)
     {
         $this->_apiVersion = $apiVersion;
 
@@ -116,7 +118,8 @@ class Client
     /**
      * @return mixed
      */
-    public function getClient()
+    public
+    function getClient()
     {
         return $this->_client;
     }
@@ -127,11 +130,11 @@ class Client
      * @return mixed
      * @throws \RuntimeException
      */
-    private function makeApiResponse($jsonString)
+    private
+    function makeApiResponse($jsonString)
     {
         $data = json_decode($jsonString, true);
-        if (!$data)
-        {
+        if (!$data) {
             throw new \RuntimeException("Unable to decode json response: $jsonString");
         }
 
@@ -143,7 +146,8 @@ class Client
      *
      * @return string
      */
-    public function getToken()
+    public
+    function getToken()
     {
         return $this->_token;
     }

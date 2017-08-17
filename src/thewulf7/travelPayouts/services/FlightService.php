@@ -79,10 +79,11 @@ class FlightService extends AbstractService implements iService
      * Get search results
      *
      * @param string $uuid Search ID
+     * @param bool|true $returnJson
      *
      * @return mixed
      */
-    public function getSearchResults($uuid)
+    public function getSearchResults($uuid, $returnJson = true)
     {
         $url = 'flight_search_results';
 
@@ -90,7 +91,7 @@ class FlightService extends AbstractService implements iService
             'uuid' => $uuid,
         ];
 
-        return $this->getClient()->setApiVersion('v1')->execute($url, $options);
+        return $this->getClient()->setApiVersion('v1')->execute($url, $options, 'GET', true, $returnJson);
     }
 
     /**
@@ -115,7 +116,7 @@ class FlightService extends AbstractService implements iService
 
         //Add token at start of array
         array_unshift($options,$this->getClient()->getToken());
-        
+
         return md5(implode(':', $options));
 
     }
